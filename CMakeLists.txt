@@ -32,7 +32,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${EMSCRIPTEN_LINK_FLAGS_ST
 set(CMAKE_EXECUTABLE_SUFFIX ".js")
 
 # Create the executable
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} src/main.cpp)
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME} glfw # From Emscripten

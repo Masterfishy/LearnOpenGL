@@ -1,0 +1,23 @@
+FROM docker.io/nginx:alpine
+
+# Install inotify-tools for hot reloads
+RUN apk add --no-cache inotify-to
+
+# Copy web artifacts
+COPY web /usr/share/nginx/htmlols
+
+# Copy entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Set up build volume
+VOLUME 
+
+# Set entrypoint
+ENTRYPOINT ["/entrypoint.sh"]
+
+# Expose port
+EXPOSE 80
+
+# Default command
+CMD ["nginx", "-g", "daemon off;"]
