@@ -7,6 +7,8 @@
 // System includes
 #include <iostream>
 
+#define DRAW_TRIANGLE false
+
 /////////////
 // Shaders //
 /////////////
@@ -34,6 +36,7 @@ GLFWwindow* gWindow = nullptr;
 unsigned int shaderProgram;
 unsigned int VAO;
 unsigned int VBO;
+unsigned int EBO;
 
 /////////////
 // Program //
@@ -53,7 +56,13 @@ void mainLoop()
     // Draw
     glUseProgram(shaderProgram);
     glBindVertexArray(VAO);
+
+#if DRAW_TRIANGLE
     glDrawArrays(GL_TRIANGLES, 0, 3);
+#else
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+#endif
+    glBindVertexArray(0);
 
     // End of frame
     glfwSwapBuffers(gWindow);
@@ -138,10 +147,21 @@ int main()
     // Vertex Data //
     /////////////////
 
-    float vertices[] = {
+    float triangleVertices[] = {
         -0.5f, -0.5f, 0.0f,
          0.5f, -0.5f, 0.0f,
          0.0f,  0.5f, 0.0f
+    };
+
+    float rectangleVertices[] = {
+         0.5f,  0.5f, 0.0f, // top right
+         0.5f, -0.5f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f, // bottom left
+        -0.5f,  0.5f, 0.0f  // top left
+    };
+    unsigned int rectangleIndices[] = {
+        0, 1, 3,    // first triangle
+        1, 2, 3     // second triangle
     };
 
     glGenVertexArrays(1, &VAO);
@@ -149,7 +169,16 @@ int main()
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // Using static draw because the triangle doesn't move
+
+#if DRAW_TRIANGLE
+    glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW); // Using static draw because the triangle doesn't move
+#else
+    glBufferData(GL_ARRAY_BUFFER, sizeof(rectangleVertices), rectangleVertices, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(rectangleIndices), rectangleIndices, GL_STATIC_DRAW);
+#endif
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
