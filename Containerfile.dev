@@ -3,5 +3,6 @@ FROM docker.io/emscripten/emsdk:latest
 RUN apt-get update && apt-get install -y \
     cmake \
     git \
+    clang-format \
     build-essential \
     && rm -rf /var/lib/apt/lists/*

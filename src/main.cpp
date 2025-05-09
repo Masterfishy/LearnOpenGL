@@ -6,7 +6,7 @@
 // System includes
 #include <iostream>
 
-GLFWwindow* gWindow;
+GLFWwindow* gWindow = nullptr;
 
 void mainLoop()
 {
@@ -15,11 +15,13 @@ void mainLoop()
         return;
     }
 
-    while (!glfwWindowShouldClose(gWindow))
-    {
-        glfwSwapBuffers(gWindow);
-        glfwPollEvents();
-    }
+    // Start of frame
+    glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    
+    // End of frame
+    glfwSwapBuffers(gWindow);
+    glfwPollEvents();
 }
 
 int main()
@@ -41,8 +43,9 @@ int main()
 
     glViewport(0, 0, 800, 600);
 
-    emscripten_set_main_loop(mainLoop, 0, false);
+    emscripten_set_main_loop(&mainLoop, 0, true);
 
+    glfwDestroyWindow(gWindow);
     glfwTerminate();
     return 0;
 }

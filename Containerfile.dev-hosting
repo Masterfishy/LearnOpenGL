@@ -1,17 +1,17 @@
 FROM docker.io/nginx:alpine
 
 # Install inotify-tools for hot reloads
-RUN apk add --no-cache inotify-to
+RUN apk add --no-cache inotify-tools
 
 # Copy web artifacts
-COPY web /usr/share/nginx/htmlols
+COPY web /usr/share/nginx/html
 
-# Copy entrypoint script
+# Copy Nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy entrypoint script to detect changes
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-
-# Set up build volume
-VOLUME 
 
 # Set entrypoint
 ENTRYPOINT ["/entrypoint.sh"]

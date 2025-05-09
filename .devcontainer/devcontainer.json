@@ -10,5 +10,12 @@
           "xaver.clang-format"
         ]
       }
-    }
+    },
+    "mounts": [
+      {
+        "source": "build-volume",
+        "target": "${containerWorkspaceFolder}/build",
+        "type": "volume"
+      }
+    ]
   }
