@@ -39,7 +39,7 @@ const char *fragmentShaderSource = "#version 300 es\n"
 
 GLFWwindow *window = nullptr;
 
-Shader shader = Shader("shaders/vertex.glsl", "fragment.glsl");
+Shader shader = Shader("shaders/vertex.glsl", "shaders/fragment.glsl");
 
 unsigned int VAO;
 unsigned int VBO;
