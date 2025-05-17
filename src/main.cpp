@@ -13,7 +13,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 
-#define DRAW_TRIANGLE true
+#define DRAW_TRIANGLE false
 
 ////////////////
 // GL Objects //
@@ -25,6 +25,7 @@ Shader *shader = nullptr;
 unsigned int VAO;
 unsigned int VBO;
 unsigned int EBO;
+unsigned int texture;
 
 /////////////
 // Program //
@@ -49,6 +50,7 @@ void mainLoop()
 #if DRAW_TRIANGLE
     glDrawArrays(GL_TRIANGLES, 0, 3);
 #else
+    glBindTexture(GL_TEXTURE_2D, texture);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 #endif
     glBindVertexArray(0);
@@ -93,7 +95,6 @@ int main()
     // Create Textures //
     /////////////////////
 
-    unsigned int texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -124,25 +125,20 @@ int main()
 
 #if DRAW_TRIANGLE
     float vertices[] = {
-        // positions        // colors
-        0.5f,  -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom right
-        -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom left
-        0.0f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f  // top
+        // positions         // colors          // texture coords
+         0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f, // bottom left
+         0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.5f, 1.0f  // top
     };
-
-    float texCoords[] = {
-        0.0f, 0.0f, // lower-left corner
-        1.0f, 0.0f, // lower-right corner
-        0.5f, 1.0f  // top-center corner
-    };
-
 #else
     float vertices[] = {
-        0.5f,  0.5f,  0.0f, // top right
-        0.5f,  -0.5f, 0.0f, // bottom right
-        -0.5f, -0.5f, 0.0f, // bottom left
-        -0.5f, 0.5f,  0.0f  // top left
+        // positions         // colors          // texture coords
+         0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f, // top right
+         0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, // bottom left
+        -0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 0.0f,  0.0f, 1.0f  // top left
     };
+
     unsigned int indices[] = {
         0, 1, 3, // first triangle
         1, 2, 3  // second triangle
@@ -166,6 +162,10 @@ int main()
     // Color attribute
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    // Texture coordinate attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 #else
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
@@ -173,8 +173,17 @@ int main()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+    // Position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
+
+    // Color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    // Texture coordinate attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 #endif
 
     /////////////////////
