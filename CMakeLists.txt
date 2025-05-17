@@ -20,7 +20,8 @@ set(EMSCRIPTEN_LINK_FLAGS
     # Flags for asset loading
     # "-s FETCH=1"
     # "-s ASYNCIFY=1"
-    # "--preload-file assets"
+    "--preload-file shaders"
+    "--preload-file textures"
     # Flags for audio support
     # "-s USE_SDL=2"
     # "-s USE_SDL_MIXER=2"
@@ -39,11 +40,14 @@ target_link_libraries(${PROJECT_NAME} glfw # From Emscripten
 )
 
 # Include directories
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+                                                   ${CMAKE_CURRENT_SOURCE_DIR}/external)
 
 # Copy resource files to build
 add_custom_target(copy_resources
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/web ${CMAKE_CURRENT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/web
+                                               ${CMAKE_CURRENT_LIST_DIR}/assets 
+                                               ${CMAKE_CURRENT_BINARY_DIR}
 )
 add_dependencies(${PROJECT_NAME} copy_resources)
 

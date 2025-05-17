@@ -11,6 +11,10 @@
 
 class Shader
 {
+  private:
+    /// @brief The initialized state of the shader program.
+    bool mInitialized;
+
   public:
     /// @brief The shader program ID.
     unsigned int ID;
@@ -18,7 +22,7 @@ class Shader
     /// @brief Read and build the given shaders.
     /// @param vertexSourcePath     The path to the vertex shader source.
     /// @param fragmentSourcePath   The path to the fragment shader source.
-    Shader(const char *vertexSourcePath, const char *fragmentSourcePath)
+    Shader(const char *vertexSourcePath, const char *fragmentSourcePath) : mInitialized(true), ID(0)
     {
         //////////////////////////
         // Retrieve Source Code //
@@ -56,6 +60,8 @@ class Shader
         catch (std::ifstream::failure e)
         {
             std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ" << std::endl;
+            mInitialized = false;
+            return;
         }
 
         const char *vertexShaderCode = vertexCode.c_str();
@@ -79,6 +85,7 @@ class Shader
         {
             glGetShaderInfoLog(vertex, 512, NULL, infoLog);
             std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+            mInitialized = false;
         }
 
         // Fragment shader
@@ -91,6 +98,7 @@ class Shader
         {
             glGetShaderInfoLog(fragment, 512, NULL, infoLog);
             std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+            mInitialized = false;
         }
 
         // Shader program
@@ -104,6 +112,7 @@ class Shader
         {
             glGetProgramInfoLog(ID, 512, NULL, infoLog);
             std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << std::endl;
+            mInitialized = false;
         }
 
         // Delete shaders
@@ -114,7 +123,10 @@ class Shader
     /// @brief Use/activate the shader.
     void use()
     {
-        glUseProgram(ID);
+        if (mInitialized)
+        {
+            glUseProgram(ID);
+        }
     }
 
     /// @brief Set the bool value of the given named uniform.
@@ -122,7 +134,10 @@ class Shader
     /// @param value    The value to set the uniform.
     void setBool(const std::string &name, bool value) const
     {
-        glUniform1i(glGetUniformLocation(ID, name.c_str()), static_cast<int>(value));
+        if (mInitialized)
+        {
+            glUniform1i(glGetUniformLocation(ID, name.c_str()), static_cast<int>(value));
+        }
     }
 
     /// @brief Set the int value of the given named uniform.
@@ -130,7 +145,10 @@ class Shader
     /// @param value    The value to set the uniform.
     void setInt(const std::string &name, int value) const
     {
-        glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
+        if (mInitialized)
+        {
+            glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
+        }
     }
 
     /// @brief Set the float value of the given named uniform.
@@ -138,6 +156,9 @@ class Shader
     /// @param value    The value to set the uniform.
     void setFoat(const std::string &name, float value) const
     {
-        glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
+        if (mInitialized)
+        {
+            glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
+        }
     }
 };

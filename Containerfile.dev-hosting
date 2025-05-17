@@ -3,9 +3,6 @@ FROM docker.io/nginx:alpine
 # Install inotify-tools for hot reloads
 RUN apk add --no-cache inotify-tools
 
-# Copy web artifacts
-COPY web /usr/share/nginx/html
-
 # Copy Nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 

@@ -9,37 +9,18 @@
 #include <iostream>
 #include <math.h>
 
+// External includes
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb/stb_image.h"
+
 #define DRAW_TRIANGLE true
-
-/////////////
-// Shaders //
-/////////////
-
-const char *vertexShaderSource = "#version 300 es\n"
-                                 "precision mediump float;\n"
-                                 "layout (location = 0) in vec3 aPos;\n"
-                                 "layout (location = 1) in vec3 aColor;\n"
-                                 "out vec3 ourColor;\n"
-                                 "void main(){\n"
-                                 "   gl_Position = vec4(aPos, 1.0);\n"
-                                 "   ourColor = aColor;\n"
-                                 "}\0";
-
-const char *fragmentShaderSource = "#version 300 es\n"
-                                   "precision mediump float;\n"
-                                   "in vec3 ourColor;\n"
-                                   "out vec4 FragColor;\n"
-                                   "void main(){\n"
-                                   "   FragColor = vec4(ourColor, 1.0);\n"
-                                   "}\0";
 
 ////////////////
 // GL Objects //
 ////////////////
 
 GLFWwindow *window = nullptr;
-
-Shader shader = Shader("shaders/vertex.glsl", "shaders/fragment.glsl");
+Shader *shader = nullptr;
 
 unsigned int VAO;
 unsigned int VBO;
@@ -61,7 +42,7 @@ void mainLoop()
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Draw
-    shader.use();
+    shader->use();
 
     glBindVertexArray(VAO);
 
@@ -102,6 +83,41 @@ int main()
     glfwMakeContextCurrent(window);
     glViewport(0, 0, 800, 600);
 
+    ////////////////////
+    // Create Shaders //
+    ////////////////////
+
+    shader = new Shader("shaders/vertex.glsl", "shaders/fragment.glsl");
+
+    /////////////////////
+    // Create Textures //
+    /////////////////////
+
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("textures/container.jpg", &width, &height, &nrChannels, 0);
+
+    if (data != nullptr)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cout << "Failed to load texture!" << std::endl;
+    }
+
     /////////////////
     // Vertex Data //
     /////////////////
@@ -113,6 +129,13 @@ int main()
         -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom left
         0.0f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f  // top
     };
+
+    float texCoords[] = {
+        0.0f, 0.0f, // lower-left corner
+        1.0f, 0.0f, // lower-right corner
+        0.5f, 1.0f  // top-center corner
+    };
+
 #else
     float vertices[] = {
         0.5f,  0.5f,  0.0f, // top right
@@ -164,7 +187,10 @@ int main()
     // Shutdown //
     //////////////
 
+    delete shader;
+
     glfwDestroyWindow(window);
     glfwTerminate();
+
     return EXIT_SUCCESS;
 }

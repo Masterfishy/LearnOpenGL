@@ -36,7 +36,7 @@ podman image build -t nginx.hosting -f Containerfile.dev-hosting .
 **2. Run a container the dev hosting image**
 
 ```bash
-podman run --replace --name learnOpenGL.hosting --network host --volume build-volume:/usr/share/nginx/html:ro nginx.hosting
+podman run --replace --name learnOpenGL.hosting -p 8080:80 --volume build-volume:/usr/share/nginx/html:ro nginx.hosting
 ```
 
 ## Make the `build-volume`
